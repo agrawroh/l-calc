@@ -1,0 +1,127 @@
+To install:
+
+
+1) Download and uncompress:
+
+Download the file L-<version number>.tar.gz (for example, L-1.3.tar.gz).
+
+Uncompress and untar the file. Most machines will do this for you by simply clicking 
+on the file. At the command line it can be done as follows
+
+
+Uncompress and untar it by typing:
+
+    tar -xvf L-<version number>.tar.gz
+
+This creates a directory called L-<version number>
+
+
+2) Compiling:
+
+Go to the src directory: cd L-<version number>/src
+
+To compile type :
+
+    make
+
+This creates the command line interface: lcalc
+and also a library to which you can link if you want to write your
+own c programs: libLfunction.a
+
+
+You can also compile a long double version of lcalc by typing:
+
+    make clean
+    make DOUBLE=ld
+
+long double on intel processors (x86 architecture) gives about 19 digits precision
+(64 bits for the mantissa, 15 bits for the exponent, and 1 bit for the sign)
+but runs about three times longer.
+
+If you have installed Bailey's double double or quad double packages on
+your machine (for more details on that, see below), you can also compile
+lcalc to make use of them. double double gives around 31 decimal digits
+precision, while quad double gives around 63 digits precision.
+To compile with these packages, type:
+
+    make clean
+    make DOUBLE=dd
+
+for double double, or
+
+    make clean
+    make DOUBLE=qd
+
+for quad double. These create the executable programs lcalc_dd and lcalc_qd
+respectively, and corresponding libraries for the c++ programmer.
+
+Finally a version using mpfr is available by typing
+
+    make clean
+    make DOUBLE=mpfr
+
+Please read below for more detailed info about compiling
+to use this package along with optional packages such as Bailey's double double
+and quad double precision library, MPFR, or Pari.
+
+
+3) Installing
+
+If you have root powers, you can do: sudo make install
+to install lcalc in /usr/local/bin and libLfunction.a in /usr/local/lib
+(or elsewhere by modifying the Makefile).
+
+Likewise for the long double, double double, quad double, or mpfr versions, by typing,
+respectively,
+
+    sudo make DOUBLE=ld install
+    sudo make DOUBLE=dd install
+    sudo make DOUBLE=qd install
+    sudo make DOUBLE=mpfr install
+
+4) Performance of the various versions, to compute the first 10000
+zeros of the Riemann zeta function
+on my macbook pro laptop: 2.66 ghz intel core i7
+
+
+command                         time
+-----------------------         ---------
+ ./lcalc -z 10000
+ ./lcalc_ld -z 10000
+ ./lcalc_dd -z 10000
+ ./lcalc_qd -z 10000
+ ./lcalc_mpfr -z 10000
+ ./lcalc_mpfr -z 10000 -P 200
+ ./lcalc_mpfr -z 10000 -P 400
+ ./lcalc_mpfr -z 10000 -P 800
+
+5) If you wish to use the built in elliptic curve L-function constructor
+you need to have pari installed on your machine and uncomment the following
+line in the Makefile:
+
+PREPROCESSOR_DEFINE = -DINCLUDE_PARI
+
+Otherwise (the default), just comment out the line:
+
+#PREPROCESSOR_DEFINE = -DINCLUDE_PARI
+
+In the former case (-DINCLUDE_PARI) you also need to make sure that
+the following are set to reflect the correct location on your machine
+of the pari header file and library. The default in the Makefile
+for the location of pari is:
+
+LOCATION_PARI_H = /usr/local/include/pari
+LOCATION_PARI_LIBRARY = /usr/local/lib
+
+You will have to modify these lines if pari is installed in
+different locations on your machine.
+
+3) at the unix prompt type: make
+(If you wish to recompile later, type: make clean
+before retyping: make)
+
+This will create the command line application called lcalc
+and also a library, libLfunction.so, that can be linked to if
+you wish to write your own code. See the README file for usage
+and a mini tutorial.
+

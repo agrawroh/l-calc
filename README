@@ -1,0 +1,447 @@
+
+Dear Colleagues,
+
+Here is the latest version of the L-function c++ class library and, the command line
+program lcalc.
+
+For compiling instructions, please see the INSTALL.txt file.
+
+
+======================================================================================
+
+There are three ways to use the package:
+
+1) via the command line interface, lcalc (or, if compiled, its higher precision cousins:
+lcalc_ld, lcalc_dd, lcalc_qd, lcalc_mpfr).
+
+2) by writing c++ programs that make use of the L-function class library
+
+3) via sage. At present version L-1.23 (a bit buggy) is available through sage.
+Version 1.3 should be incorporated in the latter half of 2011.
+
+
+=====================================================================================
+
+
+Instructions for the command line program lcalc:
+
+
+If you have compiled higher precision versions of lcalc
+(lcalc_ld, lcalc_dd, lcalc_qd, or lcalc_mpfr), then all of the following
+instructions below apply to those programs as well with `lcalc' replaced by
+'lcalc_ld' etc.
+
+-----------------------------------------------------------------------------
+The command line version allows for the computation of zeros and values of
+several built in L-functions, as well as by feeding the program a file
+containing basic data for an L-function.
+
+
+To learn usage:
+
+./lcalc --help |more
+
+or
+
+./lcalc -h |more
+
+
+The default L-function is the Riemann zeta function. First I'll explain how to
+use some basic options with zeta. Then I'll explain the options that allow you
+to carry out other L-function computations.
+
+----------------------------------------------------------------------------
+
+To compute zeros of zeta use the --zeros or -z option:
+
+./lcalc -z 1000
+
+computes the first 1000 zeros of zeta while also checking for RH and making
+sure no zeros are missed.
+
+The numbers outputed are the imaginary parts of the zeros of the zeta function
+
+The -z option tests for RH by comparing the number of zeros found to the main
+term in the formula for N(T). The difference, S(T), should be small on average.
+If not, then missing zeros are detected and the program backtracks a few zeros
+looking for sign changes in more refined steps. This is repeated until the
+missing zeros are found within reasonable time. If not, then the program exits.
+
+
+Starting with version 1.3, the program also double checks the zeros before
+outputting them, by using the explicit formula to compare sums over the zeros
+to sums over primes. The program uses this comparison to dynamically set the
+output precision, and exits if both sides do not agree to at least two places
+after the decimal.
+
+More precisely, the Riemann-Weil explicit formula is checked repeatedly, as
+zeros are outputted. Let the non-trivial zeros of L(s) be 1/2 + i gamma.
+Let f(x) be a function of the form:  f(x) = exp(-A(x-x_0)^2), where A=log(10)/Digits,
+Digits the working precision (15 for built in doubles), and x_0 varies as explained
+shortly.
+
+
+Then sums over the zeros
+
+         -----
+          \
+           )    f(gamma)
+          /
+         -----
+         gamma
+
+
+are computed in two ways to working precision: using the numerically
+computed zeros, and using the explicit formula to express the sum over zeros as
+a sum over primes powers. These two are compared, and the program uses the amount
+of agreement between the two to help decide the output precision of the zeros.
+If the two do not agree to at least two digits after the decimal,
+then the program quits.
+
+x_0 is chosen to coincide with a zero of L(s), say gamma_j,
+but translated by .5 so as to desymmetrize f(x) (not translating would leave
+f(x) an even function, and it would be quadratically, rather than linearly, 
+sensitive to inaccuracies in the zeros).
+
+For the first XXXX
+many zeros outputted, a separate test function f is used, with x_0 coinciding
+with each of those zeros. Thereafter, a new f is taken every 5 zeros outputted,
+with x_0 coinciding with every 5th zero.
+
+----------------------------------------------------------------------------
+
+You can also start after the Nth zero. For example
+
+./lcalc -z 1000 -N 1000000
+
+outputs the first thousand zeros above the millionth zero. Caution: the -N
+option evaluates N(T) by using the formula involving the main term (from the
+Gamma factors) and S(T). S(T) is computed by looking at the change of arg of
+L(s) as one goes from 1/2-iT to infinity-iT and then up to infinity+iT and to
+1/2+iT. This can take a long time if T is near the ordinate of a zero. One
+could improve this by implementing Turing's method for finding the Nth zero (only
+looking at sign changes on the critical line), or by tweaking the starting point and
+suppressing a corresponding number of zeros should the program take too long,
+but for now, only the contour integral is computed.
+
+(to clarify- a variant of Turing's method which only looks on the critical line
+*is* used for the -z option, to test that all zeros have been found.
+However, with regards to the -N option, S(T) is initially computed via contour
+integration to zoom in on the Nth zero).
+
+
+----------------------------------------------------------------------------
+
+If you aren't concerned about verifying RH, or if RH doesn't hold (for
+instance, if you plan to study Dirichlet series without Euler products) you
+could look for zeros using the --zeros-interval option. For example,
+
+./lcalc --zeros-interval -x 10 -y 100 --stepsize .1
+
+searches for zeros of zeta in the interval from 1/2+10i to 1/2+100i, checking
+for sign changes advancing in steps of size .1. The first column outputs the
+imaginary part of the zero, the second column a quantity related to S(T)- it
+increases roughly by 2 whenever a sign change, i.e. pair of zeros, is missed.
+Higher up the critical strip you should use a smaller stepsize so as not to
+miss zeros. The --zeros-interval options makes sense if you want to output
+zeros as they are found.
+
+The -z option, which verifies RH, looks for several dozen zeros to make sure
+none have been missed before outputting any zeros at all, so takes longer than
+--zeros-interval to output just the first few zeros. For collecting more than
+just a handful of zeros, or to make certain that no zeros have been missed, one
+should use the -z option.
+
+----------------------------------------------------------------------------
+
+To compute values:
+
+./lcalc -v -x .5 -y 100
+
+computes the value of zeta at s=.5+100i, outputting the real and imaginary
+parts of the result.
+
+----------------------------------------------------------------------------
+
+You can also compute values along a line segment at equally spaced points:
+
+./lcalc --value-line-segment -x .5 -y 0 -X .5 -Y 100 --number-samples 10000
+
+computes zeta from s=.5+0i to .5+100i at 1000 equally spaced sample points,
+outputting the real and imaginary parts of the sample points and the
+corresponding zeta values.
+
+----------------------------------------------------------------------------
+
+There are some built in L-functions: twists by Dirichlet characters (this
+currently works for zeta and cusp form L-functions).
+
+So for example
+
+./lcalc -v -x .5 -y 0 --twist-quadratic --start -100 --finish 100
+
+will give you L(1/2, chi_d) with -100 <= d <= 100. The short form would be
+./lcalc -v -x .5 -y 0 -q -s -100 -f 100
+
+
+Other twisting options are available, for example
+
+./lcalc -z 10 --twist-primitive --start 3 --finish 100
+
+or
+
+./lcalc -z 200 -p -s 3 -f 100
+
+gives the first 200 zeros of all primitive L(s,chi) with 3 <= conductor <= 100.
+
+Notice that with the --twist-quadratic option one is specifying the
+discriminant which can be negative, while with the --twist-primitive option one
+is specifying the conductor which should be positive.
+
+----------------------------------------------------------------------------
+
+When using the various twisting options, other than --twist-quadratic, the
+second column outputted is a label for the character mod n. It is an integer
+between 1 and phi(n). If one is restricting to primitive charcters, then only a
+subset of these integers appear in the second column.
+
+One can obtain a table of characters using the --output-character, or -C,
+option. This doesn't work with the --twist-quadratic option, but does with the
+other twisting options.
+
+The --output-character option requires either a '1' or '2'. 1 is to print a
+comprehensive table of chi(n) for all gcd(n,conductor)=1.
+
+./lcalc -z 10 --twist-primitive --start 3 --finish 100 --output-character 1
+
+will also output a table for each character before outputting the zeros of the
+corresponding L-function.
+
+The characters are constructed multiplicatively in terms of generators of the
+cyclic groups mod the prime powers that divide n, and there's no simple formula
+to go from the label to the character. That's why I have the -C 1 option ouputs
+a table for each character (use in conjunction with the -p, -g, -a, -A, or -c
+option, but not with the -q option).
+
+This ouputs a table of the character before outputting say the zeros requested.
+There are 6 columns. column 1: n column 2: a label for the character, an
+integer between 1 and phi(n). column 3: the conductor of the inducing character
+(same as column 1 if primitive). column 4: m, integer that is coprime with n
+column 5: Re(chi(m)) column 6: Im(chi(m))
+
+The '2' option is to print just the value of chi(-1), i.e. whether chi is even
+or odd, and also whether chi is primitive or not.
+
+----------------------------------------------------------------------------
+
+There's also the Ramanujan tau L-function. You can use the --tau option
+
+For instance
+
+./lcalc -z 1000 --tau
+
+gives the first 1000 zeros of L_tau(s). You can combine it with twisting
+options.
+
+----------------------------------------------------------------------------
+
+If you have pari and wish to compute the L-function of an elliptic curve, you
+can modify the Makefile and uncomment the line #PARI_DEFINE = -DINCLUDE_PARI
+That allows you (after doing a 'make clean' and 'make') to use the -e option
+successfully. The --help option explains usage. It can be combined with twists.
+
+For example
+
+./lcalc -z 30 -e --a1 0 --a2 0 --a3 0 --a4 0 --a6 1
+
+computes the first thirty zeros of the L_function associated to the elliptic
+curve y^2  = x^3 + 1. The above is consistent with the unix convention that has
+a '-' for single letter options and '--' for options that are longer, for
+example '--a1'. The naming convention here will be changed in a future version
+to be more elegant.
+
+----------------------------------------------------------------------------
+
+If you have a long run you can add nohup at the start of the line and an & at
+the end to run in the background (do I need to tell you that?). You can also
+use the > to direct output to a file:
+
+For example
+
+nohup ./lcalc -z 1000 --tau > my_tau_zeros &
+
+will compute, in the background, the first 1000 zeros of L_tau(s) and send the
+output to the file my_tau_zeros.
+
+----------------------------------------------------------------------------
+
+Other useful options: --rank-compute   Computes the analytic rank (short form:
+-r) --derivative=INT Compute derivative (short form -d INT).
+
+Presently the derivative option uses numeric differentiation (taking linear
+combinations of L(s+mh), m \in Z, to pull out the relevant Taylor coefficient
+of L(s)). For high derivatives one should use one of the higher precision
+versions of lcalc.
+
+
+Analytic rank works well even for high rank since the method used does not
+compute derivatives, but rather looks at the behaviour of the L-function near
+the critical point.
+
+-----------------------------------------------------------------------------
+
+Finally, you can read in an L-function from a file. The file should contain
+functional equation data, Dirichlet coefficients and some other useful
+quantities. To read in the file you use the -F option.
+
+For example, say you have a datafile called example_data_files/data_tau
+containing data for the Ramanujan tau L-function. Then, for instance,
+
+./lcalc --zeros-interval -x 0 -y 100 --stepsize .1 -F
+example_data_files/data_tau
+
+computes the zeros on the critical line, from .5+0i to .5+100i, of the
+L-function in the file example_data_files/data_tau, by looking in steps of size
+.1 You could also use the -z option as explained earlier. (The Ramanjuan tau
+L-function is also available as a built in L-function, using the --tau option
+rather than the -F option).
+
+You can also grab the file if it resides on a webpage by using --url or -u
+option instead of -F and specifying the url of the file.
+
+For the -F or -u options to work, you must have enough Dirichlet coefficients in your file.
+The program should complain if you don't.
+
+Here is the format for the datafile. At the end of the explanation I'll give you
+an example. The explanation is a bit long, but basically you need to specify
+the functional equation, Dirichlet coefficients, and some helpful info.
+
+The first line should contain an integer, either 1,2, or 3
+1 specifies that the Dirichlet coefficients are to be given as integers (up to 32 bits long),
+2 that they are floating point numbers, 3 that they are complex numbers. So, for example,
+the first line would be a 2 for cusp form or Maass form L-function (we normalize the L-functional
+so that the functional equation is s<->1-s, so the normalized Dirichlet coefficients for a cusp
+form L-function are not integers).
+
+The second line specifies info that the calculator can exploit (or will exploit at some future date).
+It is an integer that is assigned to different types of L-functions. Currently:
+-1 for zeta
+0 for unknown
+1 for periodic including L(s,chi)
+-2 for L(s,chi) but where the # coeffs computed is < period.
+2 for cusp form (in S_K(Gamma_0(N))
+3 for Maass form for SL_2(Z)
+other integers reserved for future types.
+
+The third line is an integer that specifies how many Dirichlet coefficients to read. There
+should be at least these many Dirichlet coefficients in the file. This is a useful quantity
+to specify since sometimes (I might include this as a command line option at some point)
+the data file might have, say, 100 million coefficients, but one might want to read in,
+say, just 10000 of them.
+
+The fourth line is either 0, if the Dirichlet coefficients are *not* periodic, or a positive integer
+specifying the period otherwise (this happens in the case of Dirichlet L-functions). For a Maass
+form it should be 0.
+
+The fifth line is a positive integer, the quasi-degree.
+This is the number of gamma factors of the form Gamma(gamma s + lambda)
+in the functional equation, where gamma is either .5 or 1, and lambda is a complex number
+with Re lambda >= 0.
+For example, it is 1 for Dirichlet L-functions, 1 for cusp
+form L-functions, 2 for Maass form L-functions, etc. Notice the '1' for cusp form L-functions
+could be a '2' if you wish to split the gamma factor up using the Legendre duplication formula.
+But it's better not to.
+
+Next come the gamma factors, two lines for each gamma factor.
+The first of each pair of lines contains gamma (either .5 or 1), and the second line
+contains a pair of floating point numbers separated by a space specifying the real and
+imaginary parts of lambda (even if purely real, lambda should be given as a pair
+of numbers, the second one then being 0).
+
+Next you specify the functional equation. Let Lambda(s) =
+
+          a
+       --------'
+      '  |  |
+  s      |  |
+ Q       |  |   Gamma( gamma_j s + lambda_j)   L(s)
+         |  |
+        j = 1
+
+
+                          __________
+                                   _
+satisfy Lambda(s) = omega Lambda(1-s), where Q is a real number, and omega is complex.
+Notice that the functional equation is s into 1-s, i.e. the gamma factors and Dirichlet
+coefficients of L(s) should be normalized correctly so as to have critical line Re(s)=1/2.
+
+The next line in the datafile is Q giving as a floating point number, and the one
+after that gives omega as a pair x y of floating point numbers, specifying the real and
+imaginary parts of omega (even if it equals 1 it should be given as a pair of floating
+points, for example 1 0 to indicate 1 + 0 i).
+
+We need to allow for the possibility of poles. For example, if L(s) = zeta(s)
+then Lambda(s) has simple poles with residue 1 at s=1 and residue -1 at s=0.
+To take into account such possibilities I assume that Lambda(s) has at most simple poles.
+So, the next line specifies the number of poles (usually 0) and then, for each pole there
+are two lines. The first line in each pair gives the pole x+iy  as a pair x y of floating
+point numbers. The second line specifies the residue at that pole, also as a pair of floating
+point numbers.
+
+Finally the Dirichlet coefficients. The remaining lines in the file contain
+a list of Dirichlet coefficients, at least as many as indicated in line three of
+the datafile. The coefficients can be integers, real, or complex. If
+complex they should, as usual, be given as a pair x y of floating point numbers
+separated by a space. Otherwise they should be given as single column of integers or 
+floating point numbers respectively.
+
+The datafile should only contain numbers and no comments. The comments below are
+for the sake of understanding the structure of the datafile. I'm including a couple
+of sample datafiles in the src/example_data_files/ directory:
+data_maass is for the Maass form for SL_2(Z) associated to the eigenvalue with R=13.779751351891.
+data_L4 contains data for the real quadratic Dirichlet L-function of conductor 4.
+data_tau is for the Ramanujan tau L-function.
+(the latter two L-functions are also available as a built in option:
+the first using the options: --twist-quadratic -s -4 -f -4
+the second using the option: --tau).
+
+Here are the first few lines of data_maass (by the way, this is just
+as an example... the Dirichlet coefficients I have for this particular L-function
+are only accurate to a handful of decimal places, expecially near the tail
+of the file).
+
+2     the two indicates that the Dirichlet coefficients are real
+3     what type of L-function. '3' is for a Maass form L-function
+29900 How many Dirichlet coefficients to read in
+0     zero since coefficients are not periodic
+2     number of gamma factors of the form Gamma(gamma s + lambda)
+.5    first gamma
+0 6.88987567594535  first lambda
+.5    second gamma
+0 -6.88987567594535  second lambda
+.3183098861837906715  the Q in the functional equation
+1 0   the omega in the functional equation, omega = 1 + 0i
+0     the number of poles of Lambda(s)
+1     the first Dirichlet coefficient
+1.549304477941 the second Dirichlet coefficient
+0.246899772454 the third Dirichlet coefficient
+1.400344365369 the fourth Dirichlet coefficient
+etc
+
+-----------------------------------------------------------------------------
+For programmers:
+
+If you want to write your own c++ program that makes use of the
+Lfunction library, rather than just use the command line interface,
+please look at the directory: example_programs, or, for a more complex
+example, at the source code for the commandline interface (the files of
+the form Lcommandline*.cc)
+
+For an idea on how to compile, while in the src directory type: make examples
+
+The include directory contains the L-function class. The main file is
+L.h. The comments in that file explain the makeup of the class.
+-----------------------------------------------------------------------------
+
+Questions, comments, and bug reports can be directed to
+Michael Rubinstein: michael.o.rubinstein@gmail.com

@@ -1,0 +1,57 @@
+package	"lcalc"
+version	"1.3 Dec 1, 2009"
+purpose "This program computes zeros and values of L-function."
+
+option "value"           v "compute L-function at x+iy. Should be used in conjuction with x and y options" flag off
+option "x"               x "Used with value,value-line-segment, and zeros-interval options" string typestr="Double" default=".5" no
+option "y"               y "Used with value,value-line-segment, and zeros-interval options" string typestr="Double" default="0" no
+option "value-file"      - "compute L-function at points specified in file" string typestr="filename" no
+option "value-line-segment" - "compute L-function along a line segment connecting (x+iy) to (X+iY) at number-sample points" flag off
+option "use-dirichlet-series" - "compute values of the L-function using specified number of terms of the Dirichlet series rather than an approximate functional equation." flag off
+option "number-terms"    - "specify how many terms of the Dirichlet series, n <= <int>, to use. Can be used with --use-dirichlet-series or --rhs-explicit-formula options." int no
+option "hardy"           - "compute the Hardy Z function, i.e. the L-function rotated to be real on the critical line" flag off
+option "X"               X "Used with value-line-segment" string typestr="Double" default=".5" no
+option "Y"               Y "Used with value-line-segment" string typestr="Double" default="100" no
+option "number-samples"  n "Used with value-line-segment, and interpolate options" int default="1000" no
+option "zeros"           z "number of zeros to find" string typestr="long long" no
+option "N"               N "start after the Nth zero. For example -z 100 -N 1000 will search for 100 zeros after the 1000th zero." string typestr="long long" no
+option "NT"              - "Compute N(T). Specify the value of T." string typestr="Double" no
+option "zeros-interval"  Z "find zeros in an interval (1/2+ix,1/2+iy) using steps of size stepsize. Use with the x,y, and stepsize options" flag off
+option "rhs-explicit-formula" - "Compute the rhs of the explicit formula with test function phi(t-x0), evaluated for x0 in [x,y], in increments of stepsize.
+                                 Specify method: hermite_<integer>, or sinc_<integer>.
+                                 Use with the --alpha --stepsize, -x, and -y options.
+                                 For example --rhs-explicit-formula sinc_3 --alpha 4 -x 0 -y 100 --stepsize .1" string typestr="Double" no
+option "alpha"           - "For use with --rhs-explicit-formula. Specifies the scaling factor to use." string typestr="Double" no
+option "stepsize"        - "Used with zeros-interval or rhs-explicit-formula" string typestr="Double" no
+option "derivative"      d "compute derivative (up to 25th). use -d -1 to specify logarithmic derivative."   int no
+option "elliptic-curve"  e "specify an elliptic curve over Q. Use with the a1 a2 a3 a4 a6 options"  flag off
+option "a1"              - "Used with the elliptic-curve option"        string typestr="rational_number" no
+option "a2"              - "Used with the elliptic-curve option"        string typestr="rational_number" no
+option "a3"              - "Used with the elliptic-curve option"        string typestr="rational_number" no
+option "a4"              - "Used with the elliptic-curve option"        string typestr="rational_number" no
+option "a6"              - "Used with the elliptic-curve option"        string typestr="rational_number" no
+option "file-input"      F "input a file with basic L-function data"    string typestr="filename" no
+option "url"             u "input a web based file with basic L-function data. Specify the url of the file" string typestr="url" no
+option "interpolate"     i "interpolate between two L-functions and find their zeros. Should be used in conjunction with file-input" string typestr="filename2" no
+option "output-character" C "if twisting, output the character"         values="1","2" default="1" no
+option "output-data"     o "output basic data for the underlying L-function" int typestr="number Dirichlet coeffs" default="10"  no
+option "verbose"         - "verbosity > 0 outputs extra info" int default="0" no
+option "precision"       P "number digits precision"                    int no
+option "sacrifice"       S "number digits to sacrifice"                 int default="3" no
+option "rank-compute"    r "compute the rank"                           flag off
+option "rank-verify"     - "verify if specified rank is correct"        int no
+option "rank-limit"      l "when doing quadratic twists limit to L-functions with specified rank" int no
+option "tau"             t "Ramanujan tau L-function (weight 12, full level)" flag off
+option "twist-quadratic" q "twist by fundamental quadratic characters, start <= discriminant <= finish. Use with start and finish options." flag off
+option "start"           s "Used with various twisting options" string typestr="integer" no
+option "finish"          f "Used with various twisting options. Default has finish=start" string typestr="integer" no
+option "twist-quadratic-even" - "twist by fundamental quadratic characters, even functional eqn, start <= discriminant <= finish" flag off
+option "twist-primitive" p "twist by all primitive Dirichlet characters with start <= conductor <= finish. For L-functions with complex Dirichlet coefficients, conjugate characters are considered equivalent" flag off
+option "twist-all"       A "twist by all Dirichlet characters with start <= conductor <= finish." flag off
+option "twist-all-no-conj-pairs" a "twist by all Dirichlet characters with start <= conductor <= finish. For L-functions with complex Dirichlet coefficients, conjugate pairs of characters are considered equivalent" flag off
+option "twist-complex-no-conj-pairs" c "twist by all complex primitive Dirichlet characters with start <= conductor <= finish. For L-functions with complex Dirichlet coefficients, conjugate pairs of characters are considered equivalent" flag off
+option "twist-generic"   g "twist by a generic complex Dirichlet characters with start <= conductor <= finish." flag off
+option "degree"          D "can only be used in conjuction with twist-primitive (?). Select characters of specified degree. Not yet implemented"  int typestr="degree" no
+option "openmp"          O "whether to use openmp parallelization (beta- very little parallelization currently implemented) . Specify the number of threads to use." int no
+option "use-blfi"         - "Can be used with use-dirichlet-series to compute values of the Dirichlet series using blf interpolation with specified interval length." int no
+

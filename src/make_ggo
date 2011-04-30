@@ -1,0 +1,15 @@
+#If you modify L_cmd.ggo you should:
+/usr/local/bin/gengetopt < Lcommandline.ggo
+#to produce cmdline.c and .h
+#and then move the cmdline.h file to the ../include/ directory:
+mv -f cmdline.h ../include/
+
+#or simply just run this script by typing ./make_ggo
+
+#To download and install gengetopt:
+#http://www.gnu.org/software/gengetopt/
+
+#Do not use fink's installed version. It doesn't seem to work.
+#Rather do a ./configure, make, make install of
+#GNU Gengetopt 2.14 (or more recent version).
+

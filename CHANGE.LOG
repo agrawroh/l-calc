@@ -1,0 +1,24 @@
+Version 1.3
+-----------
+
+Implemented explicit formula checking before outputting zeros. See the README.txt
+file for an explanation. This makes it much less likely for errors in the zeros.
+
+Fixed a subtle bug whereby one zero was counted with multiplicity, and a
+corresponding number of subsequent zeros were then overlooked (lcalc finds
+zeros by looking for sign changes of the Hardy Z function and using Turing's
+test to make sure that no zeros are missed. If missed zeros are detected, the
+program back tracks to look for them. Sometimes this resulted in the
+same zero being mistaken as two distinct zeros, if, for example, they differed
+in the last decimal place).
+
+Added the option to start at the N-th to find_zeros routine (-N in the command line).
+
+Improved routines for derivatives.
+
+Improved output precision.
+
+Implemented lcalc's own trig and complex exponential functions (basically, cosine 
+which runs about 4 times faster than machine cosine).
+
+
