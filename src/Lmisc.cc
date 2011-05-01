@@ -22,6 +22,7 @@
 
 
 #include "Lmisc.h"
+#include<stdio.h>
 
 //inline Double LOG(double n) // Used for long
 //{
