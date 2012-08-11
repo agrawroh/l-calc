@@ -123,7 +123,7 @@ endif
 # Comment out the following line to remove the use of pari's
 # elliptic curve routines. Doing so disables lcalc's -e commandline option.
 # For the -e lcalc option to work you need pari installed on your machine.
-PARI_DEFINE = -DINCLUDE_PARI
+#PARI_DEFINE = -DINCLUDE_PARI
 
 ifeq ($(PARI_DEFINE),-DINCLUDE_PARI)
     LDFLAGS += -L$(PARI_DIR)/lib -lpari

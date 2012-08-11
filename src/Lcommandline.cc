@@ -602,7 +602,8 @@ int main (int argc, char *argv[])
 
 #ifdef INCLUDE_PARI
         if(do_elliptic_curve){
-             allocatemoremem((int) N_terms*16+1000000); //XXXXXXXXX this should depend on whether we're double or long double or mpfr double
+             //allocatemoremem((int) N_terms*16+1000000); //XXXXXXXXX this should depend on whether we're double or long double or mpfr double
+             allocatemem((int) N_terms*16+1000000); //XXXXXXXXX this should depend on whether we're double or long double or mpfr double
              if (my_verbose>0) cout << "#    Will precompute " << N_terms << " elliptic L-function dirichlet coefficients..." << endl;
              current_L_type=2;
 
