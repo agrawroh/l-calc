@@ -31,6 +31,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "Lcommandline.h"
 #include "cmdline.h"
 
+void pari_err_recover_nop(long errnum) {return;}
+
 int main (int argc, char *argv[])
 {
 
@@ -602,8 +604,12 @@ int main (int argc, char *argv[])
 
 #ifdef INCLUDE_PARI
         if(do_elliptic_curve){
-             //allocatemoremem((int) N_terms*16+1000000); //XXXXXXXXX this should depend on whether we're double or long double or mpfr double
-             allocatemem((int) N_terms*16+1000000); //XXXXXXXXX this should depend on whether we're double or long double or mpfr double
+            void (*saved_err_recover)(long) = cb_pari_err_recover;
+            cb_pari_err_recover = pari_err_recover_nop;
+            allocatemem(N_terms*16 + 1000000); //XXXXXXXXX this should depend on whether we're double or long double or mpfr double
+            cb_pari_err_recover = saved_err_recover;
+
+
              if (my_verbose>0) cout << "#    Will precompute " << N_terms << " elliptic L-function dirichlet coefficients..." << endl;
              current_L_type=2;
 
