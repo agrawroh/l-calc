@@ -63,6 +63,7 @@ inline double lcalc_to_double(const double& x) { return x; }
 #endif
 
 inline double lcalc_to_double(const int& x) { return x; }
+inline double lcalc_to_double(const long double& x) { return x; }
 inline double lcalc_to_double(const long long& x) { return x; }
 inline double lcalc_to_double(const short& x) { return x; }
 inline double lcalc_to_double(const char& x) { return x; }

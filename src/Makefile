@@ -3,7 +3,8 @@
 
 
 #=============== c compiler ==================================
-CC = g++
+#CC = g++
+CC = g++-4.8
 
 #cc = /Users/mrubinst/local/gcc4.4/bin/gcc
 #CC = /Users/mrubinst/local/gcc4.4/bin/g++
@@ -143,7 +144,8 @@ MACHINE_SPECIFIC_FLAGS :=
 #MACHINE_SPECIFIC_FLAGS +=  -mpowerpc -mpowerpc64 -m64
 
 #================== disable a few of -Wall warnings ==========
-DISABLE_WARNINGS:= -Wno-unused-parameter -Wno-uninitialized
+#DISABLE_WARNINGS:= -Wno-unused-parameter -Wno-uninitialized
+DISABLE_WARNINGS= -Wno-unused-parameter -Wno-uninitialized -Wno-unused-but-set-variable
 
 ifneq ($(OPENMP_FLAG),-fopenmp)
     DISABLE_WARNINGS+= -Wno-unknown-pragmas
